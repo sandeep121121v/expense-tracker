@@ -8,10 +8,13 @@ export default function App() {
   const [expenses, setExpenses] = useState([]);
 
   const addExpense = () => {
-    if (title && amount) {
-      setExpenses([...expenses, { id: Date.now().toString(), title, amount }]);
+    const numericAmount = parseFloat(amount);
+    if (title && !isNaN(numericAmount) && numericAmount > 0) {
+      setExpenses([...expenses, { id: Date.now().toString(), title, amount: numericAmount.toFixed(2) }]);
       setTitle('');
       setAmount('');
+    } else {
+      alert('Please enter a valid title and amount.');
     }
   };
 
@@ -20,6 +23,10 @@ export default function App() {
       <Text style={styles.expenseTitle}>{item.title}</Text>
       <Text style={styles.expenseAmount}>${item.amount}</Text>
     </View>
+  );
+
+  const renderEmpty = () => (
+    <Text style={styles.emptyText}>No expenses yet. Add one above!</Text>
   );
 
   return (
@@ -39,7 +46,7 @@ export default function App() {
           placeholder="Amount"
           value={amount}
           onChangeText={setAmount}
-          keyboardType="numeric"
+          keyboardType="decimal-pad"
         />
         <TouchableOpacity style={styles.addButton} onPress={addExpense}>
           <Text style={styles.addButtonText}>Add</Text>
@@ -51,6 +58,7 @@ export default function App() {
         renderItem={renderExpense}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
+        ListEmptyComponent={renderEmpty}
       />
     </SafeAreaView>
   );
@@ -114,5 +122,11 @@ const styles = StyleSheet.create({
   expenseAmount: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#999',
+    fontSize: 16,
   },
 });
